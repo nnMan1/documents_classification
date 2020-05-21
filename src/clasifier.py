@@ -1,31 +1,51 @@
+import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import DBSCAN
-from distance import Distance
 import joblib
 import data_loader
-
-distance = joblib.load('./sgd_data.pkl')
-data = data_loader.load_documents()
-
-data_similarity = distance.distances
-
-model = AgglomerativeClustering(affinity='precomputed', n_clusters=None, linkage='average', distance_threshold=0.9).fit(data_similarity)
-#model = DBSCAN(metric='precomputed', min_samples=3, eps=0.73).fit(data_similarity)
+from distance import Distance
 
 
-def print_classes(model):
-    for i in range(len(model.labels_)):
-            print("{} {}".format(i, model.labels_[i]))
+class Classifier:
 
-def print_statistic(model):
-    for j in range(-1,200):
-        br=0
-        for i in range(len(model.labels_)):
-            if(model.labels_[i]==j):
-                br=br+1
-        print(j, br)
+    def __init__(self, classifier = AgglomerativeClustering(affinity='precomputed', n_clusters=None, linkage='average', distance_threshold=0.90)):
+        self.classifier = classifier
+    
+    def fit(self, data):
+        self.data = data
+        self.classifier.fit(data)
+    
+    def get_classification(self):
+        return self.classifier.labels_
+    
+    def get_number_of_elements_in_classes(self):
+        arr = []
 
-print_classes(model)
+        j=0
+
+        while(True):
+            br=0
+            for i in range(len(self.classifier.labels_)):
+                if(self.classifier.labels_[i]==j):
+                    br=br+1
+            
+            if(br==0):
+                break
+            else:
+                arr.append(br)
+            
+            j=j+1
+
+        return arr
+
 #print_statistic(model)
 
+if __name__ == "__main__":
+    data = data_loader.load_documents()
+    distance_matrix = joblib.load('./sgd_data.pkl')
+
+    classifier = Classifier()
+    classifier.fit(distance_matrix)
+
+    
         

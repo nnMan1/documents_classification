@@ -20,12 +20,16 @@ def load_documents():
     test = [d for d in documents if d.startswith('test/') and len(reuters.categories(d)) == 1 ]
     train = [d for d in documents if d.startswith('training/') and len(reuters.categories(d)) == 1]
 
-    #for i in range(len(train)):
-        #print("{} {}".format(i, reuters.categories(train[i])))
+    #for i in range(len(test)):
+       # print("{} {}".format(i, reuters.categories(test[i])))
 
     docs = {}
     docs['train'] = [reuters.raw(doc_id) for doc_id in train]
     docs['test'] = [reuters.raw(doc_id) for doc_id in test]
+    docs['train_names'] = train
+    docs['test_names'] = test
+    docs['train_classes'] = [reuters.categories(d) for d in documents if d.startswith('training/') and len(reuters.categories(d)) == 1]
+    docs['test_classes'] = [reuters.categories(d) for d in documents if d.startswith('test/') and len(reuters.categories(d)) == 1]
     
     return docs
 
