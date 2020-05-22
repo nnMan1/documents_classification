@@ -5,19 +5,21 @@ from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
 from scipy import sparse
 import joblib
+from data_object import DataObject
 
 class Distance:
 
     length_based_filtering_applied = False
 
-    def __init__(self, data):
+    def __init__(self, data, min_similarity = 0.2):
         self.distances = np.ones((len(data), len(data)))
-        tokenizer = Tokenizer(data, CountVectorizer(decode_error = 'ignore',stop_words = stopwords.words("english").append(['0','1','2','3','4','5','6','7','8','9'])))
-        self.shingles = tokenizer.tokenized['shingling']
-        self.universal_set = tokenizer.tokenized['universal_set']
+        vectorizer = CountVectorizer(decode_error = 'ignore')
+        tmp = vectorizer.fit_transform(data)
+        self.universal_set = vectorizer.get_feature_names()
+        self.shingles = [set(sparse.nonzero()[1]) for sparse in tmp]
         self.indexes = range(len(self.shingles)) #svi elementi su poredjani kako su usli
         self.__apply_length_based_filtering()
-        self.__calculate_distance_matrix(min_similarity=0.08)
+        self.__calculate_distance_matrix(min_similarity)
     
     def __apply_length_based_filtering(self):
         
@@ -31,9 +33,8 @@ class Distance:
     def __jacard_distance(self, i, j):
         a = self.shingles[i]
         b = self.shingles[j]
-        intersectionSize = len(set(a).intersection(set(b)))
-        unionSize = len(set(a).union(set(b)))
-        ans = intersectionSize / unionSize
+        intersection = set(a).intersection(set(b))
+        ans = len(intersection) / (len(a) + len(b) - len(intersection))
         return ans
 
     def __check_prefixes(self, i, j, min_similarity):
@@ -67,26 +68,22 @@ class Distance:
 
         return (similar + l_a - i)/(l_b+distinct)
 
-    def __calculate_distance_matrix(self, min_similarity = 0.2):
-         for i in range(len(self.indexes)):
+    def __calculate_distance_matrix(self, min_similarity = 0.05):
+         for i in range(len(self.shingles)):
             self.distances[i,i] = 0
-            j=i+1
-            while(j<len(self.indexes) and len(self.shingles[self.indexes[i]])/len(self.shingles[self.indexes[j]])>=min_similarity):
+            for j in range(i,len(self.shingles)):
                 #similaruity = self.__jacard_distance(self.indexes[i], self.indexes[j])
-                similaruity = self.__check_prefixes(self.indexes[i], self.indexes[j], min_similarity)
-               
+                similaruity = self.__jacard_distance(i,j)               
                 if(similaruity >= min_similarity):
-                    self.distances[self.indexes[i], self.indexes[j]] = 1 - similaruity
-                    self.distances[self.indexes[j], self.indexes[i]] = 1 - similaruity
-                    #potrebno nam je rastojanje a ne slicnost
-                j+=1
+                    self.distances[i, j] = 0
+                    self.distances[j, i] = 0
 
 
 if __name__=='__main__':
-    data = data_loader.load_documents()
-    distance = Distance(data['train'])
-    #joblib.dump(distance, './sgd_data.pkl', compress=9)
-    distance = joblib.load('./sgd_data.pkl')
+    data = data_loader.load_documents()['train']
+    distance = Distance([d.text  for d in data[:500]])
+    #joblib.dump(distance, './sgd_data005.pkl', compress=9)
+    #distance = joblib.load('./sgd_data.pkl')
     #joblib.dump(distance, './sgd_data0.1.pkl', compress=9)
 
     #print(len(distance.indexes))
