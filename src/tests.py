@@ -1,5 +1,4 @@
 import data_loader
-from clasifier import Classifier
 import preload
 from distance import Distance
 import joblib
@@ -17,19 +16,21 @@ def find_outliers(distance_matrix):
     return classifier.predict(distance_matrix), classifier
 
 data = data_loader.load_documents()
-distance_matrix = Distance([d.text  for d in data['train'][:2000]], min_similarity=0.13)
-ans, classifier = find_outliers(distance_matrix.distances)
 
-#distance_matrix = Distance([d.text  for d in data['train'][:1000]].append(data['test'][11]), min_similarity=0.13).distances
+#distance = Distance([d.text  for d in data['train'][:2000]], min_similarity=0.13)
+distance = Distance([d.text  for d in data['train']], min_similarity=0.13)
+
+distance_matrix = distance.calculate_distance_matrix_opptimized()
+ans, classifier = find_outliers(distance_matrix)
 
 print("Outliers are")
 
 for i in range(len(ans)):
    #if ans[i]==-1 and (data['train'][i].category in [['earn'], ['acq'], ['money-fx'], ['trade']]):
    if ans[i]==-1:
-        print(i, data['train'][i].category)
+        print(i, data['test'][i].name, data['train'][i].category)
 
-distance_matrix = distance_matrix.calcilate_distance_for([d.text  for d in data['test'][:500]])
+distance_matrix = distance.calculate_distance_for_optimized([d.text  for d in data['test'][:500]])
 
 print("Novelties are")
 ans = find_novelties(classifier, distance_matrix)
@@ -37,4 +38,4 @@ ans = find_novelties(classifier, distance_matrix)
 for i in range(len(ans)):
    #if ans[i]==-1 and (data['train'][i].category in [['earn'], ['acq'], ['money-fx'], ['trade']]):
    if ans[i]==-1:
-        print(i, data['test'][i].category)
+        print(i, data['test'][i].name, data['test'][i].category)
