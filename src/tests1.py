@@ -90,11 +90,11 @@ def find_outliers(train_data):
 
     return y_pred
 
-data = data_loader.load_documents()
+data = data_loader.load_documents(['earn','acq','money-fx','grain','crude'])
 tmp = find_outliers([d.text for d in data['train'][:1000]])
 
 for i in range(len(tmp)):
-    if tmp[i]==-1 and (data['train'][i].category in [['earn'], ['acq'], ['money-fx'], ['trade']]):
+    if tmp[i]==-1 and (data['train'][i].category[0] in ['earn','acq','money-fx','grain','crude']):
         print(i, data['train'][i].category)
 
 #check_novelty('./sgd_classifier.pkl', './sdg_vectorizer.pkl', './sgd_transformer.pkl', './sgd_traindata.pkl', data['test'], data['test_classes'])
