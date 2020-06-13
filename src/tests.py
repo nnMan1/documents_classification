@@ -22,7 +22,7 @@ random_sample = random.sample(data['train'], 2000)
 distance = Distance([d.text  for d in random_sample], min_similarity=0.15)
 #distance = Distance([d.text  for d in data['train']], min_similarity=0.13)
 
-distance_matrix = distance.calculate_distance_matrix_opptimized()
+distance_matrix = distance.calculate_distance_matrix_optimized()
 ans, classifier = find_outliers(distance_matrix)
 
 #print("Outliers are")
@@ -38,6 +38,6 @@ print("Novelties are")
 ans = find_novelties(classifier, distance_matrix)
 
 for i in range(len(ans)):
-   if ans[i]==-1 and (data['train'][i].category[0] in ['earn','acq','money-fx','grain','crude']):
+   if ans[i]==-1:
    #if ans[i]==-1:
         print(i, data['test'][i].name, data['test'][i].category)

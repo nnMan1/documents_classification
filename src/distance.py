@@ -70,7 +70,7 @@ class Distance:
         j_values = [j for j in self.hash_bucets[a].keys() if j<=(p+1)/self.min_similarity - l]
 
         for j in j_values:
-            q_values = [q for q in self.hash_bucets[a][j].keys() if (min(q,p)+1)/(max(p,q)+max(i,j)+1)]
+            q_values = [q for q in self.hash_bucets[a][j].keys() if (min(q,p)+1)/(max(p,q)+max(i,j)+1) >= self.min_similarity]
             for q in q_values:
                 possible = possible.union(self.hash_bucets[a][j][q])
         
@@ -81,7 +81,7 @@ class Distance:
         ans = len(intersection) / (len(a) + len(b) - len(intersection))
         return ans
 
-    def calculate_distance_matrix_opptimized(self):
+    def calculate_distance_matrix_optimized(self):
 
         for i in range(len(self.shingles)):
             a = self.shingles[i]
