@@ -70,6 +70,7 @@ for i in range(len(ans)):
     if ans[i]==-1:
         print(i, data['test'][i].category)
 
+<<<<<<< HEAD
 br = 0
 for i in range(len(ans)):
     if ans[i]==-1 and data['test'][i].category[0] in ['earn','acq','money-fx','grain','crude']:
@@ -87,6 +88,8 @@ print("Out worng", br)
 print("Total", len(ans))
 
 
+=======
+>>>>>>> 4889dcef82d5cc64d443db05fe2227fc45fd8614
 
 
 

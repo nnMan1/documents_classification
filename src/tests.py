@@ -41,6 +41,11 @@ print("Novelties are")
 ans = find_novelties(classifier, distance_matrix)
 
 for i in range(len(ans)):
+<<<<<<< HEAD
    #if ans[i]==-1 and (data['train'][i].category[0] in ['earn','acq','money-fx','grain','crude']):
    if ans[i]==-1:
+=======
+   if ans[i]==-1:
+   #if ans[i]==-1:
+>>>>>>> 4889dcef82d5cc64d443db05fe2227fc45fd8614
         print(i, data['test'][i].name, data['test'][i].category)

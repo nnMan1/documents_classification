@@ -1,4 +1,5 @@
 import nltk
+nltk.download('reuters')
 from nltk.corpus import reuters
 from nltk.corpus import stopwords
 from sklearn.preprocessing import MultiLabelBinarizer
@@ -13,6 +14,9 @@ def load_documents(categories=[]):
     if categories == []:
         categories = reuters.categories()
 
+    if categories == []:
+        categories = labels
+
     documents = reuters.fileids()
     test = [d for d in documents if d.startswith('test/') and len(reuters.categories(d)) == 1 ]
     train = [d for d in documents if d.startswith('training/') and len(reuters.categories(d)) == 1 and reuters.categories(d)[0] in categories]
@@ -24,9 +28,13 @@ def load_documents(categories=[]):
     return docs
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     data = load_documents()
+=======
+    data = load_documents(['earn', 'acq'])
+>>>>>>> 4889dcef82d5cc64d443db05fe2227fc45fd8614
 
-    print(data['train'][0])
+    print(data['train'][0].text)
 
     #print(tokenize(data['train'])['shingling'][0])
    #print(data['train'][4])
