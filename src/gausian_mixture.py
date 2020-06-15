@@ -16,12 +16,12 @@ from sklearn.mixture import BayesianGaussianMixture
 from sklearn.model_selection import StratifiedKFold
 from sklearn.feature_extraction.text import TfidfTransformer
 
-def filer(data_from_model, data_to_classify, category=None):
+def filer(data_from_model, data_to_classify, category=None, trashold=1, trashold_similarity=0.17):
 
     test_data = data_from_model[int(len(data_from_model)*2/3):]
     data_from_model = data_from_model[:int(len(data_from_model)*2/3)]
 
-    distance = Distance(data_from_model, 0.15)
+    distance = Distance(data_from_model, trashold_similarity)
     data_from_model = distance.calculate_distance_matrix_optimized()
     data_to_classify = distance.calculate_distance_for_optimized(data_to_classify)
     test_data = distance.calculate_distance_for_optimized(test_data)
@@ -36,7 +36,7 @@ def filer(data_from_model, data_to_classify, category=None):
 
     ans = [-1]*len(data_to_classify)
     for i in range(len(score_samples)):
-        if score_samples[i]<max_score-1:
+        if score_samples[i]<max_score-trashold:
             ans[i] = 1
     
     return ans
@@ -54,7 +54,7 @@ def find_novelties(train_data, new_data, correct_categories):
 
         mapping = [i for i in range(len(new_data)) if included[i]==-1]
 
-        ans = filer(data_from_model, data_to_classify)
+        ans = filer(data_from_model, data_to_classify, trashold=1, trashold_similarity=0.17)
 
         for i in range(len(ans)):
             if ans[i]==1:
@@ -70,26 +70,23 @@ for i in range(len(ans)):
     if ans[i]==-1:
         print(i, data['test'][i].category)
 
-<<<<<<< HEAD
 br = 0
 for i in range(len(ans)):
     if ans[i]==-1 and data['test'][i].category[0] in ['earn','acq','money-fx','grain','crude']:
         br += 1
 
-print("In worng", br)
+print("Correct data marked as novelty", br)
 
 br = 0
 for i in range(len(ans)):
     if ans[i]==1 and data['test'][i].category[0] not in ['earn','acq','money-fx','grain','crude']:
         br += 1
 
-print("Out worng", br)
+print("Novelties marked as normal data", br)
 
 print("Total", len(ans))
 
 
-=======
->>>>>>> 4889dcef82d5cc64d443db05fe2227fc45fd8614
 
 
 
