@@ -8,7 +8,10 @@ from data_object import DataObject
 n_classes = 90
 labels = reuters.categories()
 
-def load_documents(categories):
+def load_documents(categories=[]):
+
+    if categories == []:
+        categories = reuters.categories()
 
     documents = reuters.fileids()
     test = [d for d in documents if d.startswith('test/') and len(reuters.categories(d)) == 1 ]
@@ -21,7 +24,7 @@ def load_documents(categories):
     return docs
 
 if __name__ == '__main__':
-    data = load_documents(['earn'])
+    data = load_documents()
 
     print(data['train'][0])
 

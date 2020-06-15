@@ -1,0 +1,72 @@
+
+U fajlu data_loader.py
+	ucitavamo podatke iz reuters data seta
+	funkcija load_documents ucitava podateke i vraca dva niza
+	['train'], i ['test'], kao i klategorije kojima fajlovi pripadaju 
+	(mada je ne koristimo jer koristimo osim za poredjenje kojim kategorijama 
+	pripadaju fajlovi koji su proglaseni za outliers ondnosno novelties
+	--kao argument mozemo da predamo kategorije iz kojih zelimo da 
+		ucitamo podatke za treniranje to je opcioni argument
+
+U fajlu distance.py
+klasa Distance (OVA KLASA IMPLEMENTIRA PREDSTAVLJANJE DOKUMENATA KAKO JE PREPORUCENO U KNJIZI)
+
+	U klasi Distance se vrsi tokenizacija dokumenata. 
+	Tokeni za svaki dokument se predstavljaju kao niz 
+	(sortiran po broju dokumenata u kojima se token javalja)
+
+	-__hash_data vrsi hesiranje dokumenata na osnovu
+	prvih nekoliko tokena kako je opisano u glavi 3.9.6
+
+	- __find_possible_documents nalazi dokumente sa 
+	kojima je moguce da dobijemo Jaccard similarity > min_similarity
+
+	-calculate_distance_matrix racuna matricu 
+	rastojanja za zadati dkup dokumenata tako sto za svaki 
+	par dokumenata koji ima Jaccard similarity > min_similarity 
+	rastojanje je 0, svaki par dokumenata koji ima 
+	Jaccard similarity < min_similaity rastojanje je 1
+
+	-calculate_distance_matrix_optimized koristi 
+	optimizaciju opisanu u 3.9.6 pomocu funckija __hash_data, 
+	i __find_possible_documents kako bi nasla matricu rastojanja
+
+	-calculate_distance_for(data) racuna matricu rastojanja 
+	od novih podataka do poznatih podataka
+
+	-calculate_distance_for_optimized(data) racuna matricu rastojanja 
+	od novih podataka do poznatih podataka koristeci optimizacije
+
+--------------------------------------------------------------------------------------------------------------------
+
+U fajlu tests.py
+	Vrsi se ucitavanje podataka
+	Kreira se objekat tipa Distance sa ucitanim podacima
+	poziva se optimizovano racunanje matrice rastojanja
+	Nad tako dobijenom matricom rastojanja poziva se LocalOutlierFactor
+	kako bi se odredilo koji su fajlovi outliers i kako bi se izrsio training
+
+	Kad zelimo da odredimo koji su fajlovi novelties racunamo 
+	rastojanje  od tih podataka do podataka koji se vec nalazi u objektu Distance
+	i pozivamo vec istrenirani LocalOutlierFactor kako bi odredili koji su fajlovi novelties
+
+**	mozemo da pokrenemo treniranje LocalOutlierFactor nad dijelom podataka u kojima trazimo
+	outliers, a onda outliers naci kao novelties citavog skupa, sto nam daje bolje vremenske performanse
+	a ne utice znacajno za dovoljno veliki sample skup
+
+----------------------------------------------------------------------------------------------------------------------
+
+U fajlu GaussianMixture
+	Na drugi nacin vrsimo pronalazenje novelties tako sto na svakoj kategoriji regularnih vec klasterizovanih podatka
+	(npr iz kategorija earn i acq) vrsimo modelovanje Normalnom raspodjelom za svaku kategoriju pojedinacno
+	a onda iz novih podataka uklonimo sve podatke koji propadaju toj raspodijeli
+	
+
+
+
+
+
+
+
+
+

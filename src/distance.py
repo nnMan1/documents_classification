@@ -1,5 +1,4 @@
 import numpy as np
-from  tokenizer import Tokenizer 
 import data_loader
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
@@ -14,8 +13,8 @@ class Distance:
     def __init__(self, data, min_similarity = 0.2):
         self.min_similarity = min_similarity
 
-        self.distances = np.ones((len(data), len(data)))
-        vectorizer = CountVectorizer(decode_error = 'ignore')
+        vectorizer = CountVectorizer(decode_error = 'ignore', stop_words=stopwords.words().append(['0','1','2','3','4','5','6','7','8','9']))
+        #vectorizer = Tokenizer()
 
         tmp = vectorizer.fit_transform(data)
         self.shingles = [sorted(sparse.nonzero()[1]) for sparse in tmp]
@@ -70,7 +69,7 @@ class Distance:
         j_values = [j for j in self.hash_bucets[a].keys() if j<=(p+1)/self.min_similarity - l]
 
         for j in j_values:
-            q_values = [q for q in self.hash_bucets[a][j].keys() if (min(q,p)+1)/(max(p,q)+max(i,j)+1)]
+            q_values = [q for q in self.hash_bucets[a][j].keys() if (min(q,p)+1)/(max(p,q)+max(i,j)+1)  >= self.min_similarity]
             for q in q_values:
                 possible = possible.union(self.hash_bucets[a][j][q])
         
@@ -81,7 +80,9 @@ class Distance:
         ans = len(intersection) / (len(a) + len(b) - len(intersection))
         return ans
 
-    def calculate_distance_matrix_opptimized(self):
+    def calculate_distance_matrix_optimized(self):
+
+        self.distances = np.ones((len(self.shingles), len(self.shingles)))
 
         for i in range(len(self.shingles)):
             a = self.shingles[i]
@@ -94,11 +95,14 @@ class Distance:
                 similarity = self.__jacard_distance(a,b)
                 if similarity >= self.min_similarity:
                     self.distances[i,j]=0
+                    #self.distances[i,j]=1
+                    #self.distances[i,j]=similarity
         
         return self.distances
 
     def calculate_distance_for_optimized(self, data):
-        vectorizer = CountVectorizer(decode_error = 'ignore')
+        
+        vectorizer = CountVectorizer(decode_error = 'ignore', stop_words=stopwords.words().append(['0','1','2','3','4','5','6','7','8','9']))
         tmp = vectorizer.fit_transform(data)
 
         universal_set = vectorizer.get_feature_names()
@@ -129,7 +133,10 @@ class Distance:
                 b = self.shingles[j]
                 similarity = self.__jacard_distance(a,b)
                 if similarity >= self.min_similarity:
-                    ans[i, j] = 0        
+                    ans[i, j] = 0  
+                    #ans[i,j]=1      
+                    #ans[i,j]=similarity  
+
         
         return ans
       
@@ -175,16 +182,20 @@ class Distance:
 if __name__=='__main__':
 
 
-    distance = Distance(['marko kraljevic', 'musa kesedzija', 'marko kraljevic i musa kesedzija', 'marko'])
-    print(distance.distances)
+    #distance = Distance(['marko kraljevic', 'musa kesedzija', 'marko kraljevic i musa kesedzija', 'marko'])
+    #print(distance.distances)
 
-    print(distance.calculate_distance_for_optimized(['marko markovic']))
-    print(distance.calculate_distance_for(['marko markovic']))
+    #print(distance.calculate_distance_for_optimized(['marko markovic']))
+    #print(distance.calculate_distance_for(['marko markovic']))
+
+    earn = data_loader.load_documents(['earn'])
+    distance = Distance([d.text  for d in earn['test'][:200]])
+
+    acq = data_loader.load_documents(['acq'])['train'][79]
+
+    print(distance.calculate_distance_for_optimized([acq.text]))
 
 
-
-    #data = data_loader.load_documents()['train']
-    #distance = Distance([d.text  for d in data])
     #joblib.dump(distance, './sgd_data005.pkl', compress=9)
     #distance = joblib.load('./sgd_data.pkl')
     #joblib.dump(distance, './sgd_data0.1.pkl', compress=9)
